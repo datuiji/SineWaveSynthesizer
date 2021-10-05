@@ -17,19 +17,21 @@ bool SynthVoice::canPlaySound (juce::SynthesiserSound* sound)
 
 void SynthVoice::startNote (int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition)
 {
+    adsr.noteOn();
+    adsr.setSampleRate(getSampleRate());
     noteMidiNumber = midiNoteNumber;
     frequency = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
     currentAngle = 0.f;
     angleIncrement = frequency / getSampleRate() * juce::MathConstants<float>::twoPi;
     tailOff = 0.0;
+    isPlaying = true;
 }
 
 void SynthVoice::stopNote (float velocity, bool allowTailOff)
 {
     if (allowTailOff)
     {
-        if (tailOff == 0.0)
-            tailOff = 1.0;
+        adsr.noteOff();
     }
     else
     {
@@ -51,36 +53,25 @@ void SynthVoice::controllerMoved (int controllerNumber, int newControllerValue)
 
 void SynthVoice::renderNextBlock (juce::AudioBuffer <float> &outputBuffer, int startSample, int numSamples)
 {
-    if (tailOff > 0.0)
+    if (isPlaying)
     {
+        adsr.setParameters(adsrParameters);
         for (int i = startSample; i < (startSample + numSamples); i++)
         {
-            float value = std::sin(currentAngle) * level * tailOff;
-            outputBuffer.addSample(0, i, value);
-            outputBuffer.addSample(1, i, value);
-            
-            currentAngle += angleIncrement;
-            tailOff *= 0.99;
-            
-            if (tailOff <= 0.05)
+            float adsrValue = adsr.getNextSample();
+            if(adsrValue <= 0.005)
             {
-                clearCurrentNote();
-                angleIncrement = 0.0;
-                level = 0.0;
-                break;
+                isPlaying = false;
             }
-        }
-
-    }
-    else
-    {
-        for (int i = startSample; i < (startSample + numSamples); i++)
-        {
-            float value = std::sin(currentAngle) * level;
+            float value = std::sin(currentAngle) * level * adsrValue;
             outputBuffer.addSample(0, i, value);
             outputBuffer.addSample(1, i, value);
             
             currentAngle += angleIncrement;
+            if (currentAngle >= juce::MathConstants<float>::twoPi)
+            {
+                currentAngle -= juce::MathConstants<float>::twoPi;
+            }
         }
     }
 }
@@ -88,4 +79,12 @@ void SynthVoice::renderNextBlock (juce::AudioBuffer <float> &outputBuffer, int s
 void SynthVoice::setLevel(float newLevel)
 {
     level = newLevel;
+}
+
+void SynthVoice::setADSR (float attack, float decay, float sustain, float release)
+{
+    adsrParameters.attack = attack;
+    adsrParameters.decay = decay;
+    adsrParameters.sustain = sustain;
+    adsrParameters.release = release;
 }

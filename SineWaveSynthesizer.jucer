@@ -5,6 +5,19 @@
               jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
   <MAINGROUP id="kVLqwV" name="SineWaveSynthesizer">
     <GROUP id="{CD68B044-EB52-CE44-3C87-0E39EDDFCFC1}" name="Source">
+      <FILE id="ukqF3j" name="MyLookAndFeel.h" compile="0" resource="0" file="Source/MyLookAndFeel.h"/>
+      <FILE id="MsPu2j" name="FIFO.h" compile="0" resource="0" file="Source/FIFO.h"/>
+      <FILE id="LbZzjr" name="SliderController.cpp" compile="1" resource="0"
+            file="Source/SliderController.cpp"/>
+      <FILE id="kGdTvc" name="SliderController.h" compile="0" resource="0"
+            file="Source/SliderController.h"/>
+      <FILE id="eSKiGl" name="FrequencySpectrum.cpp" compile="1" resource="0"
+            file="Source/FrequencySpectrum.cpp"/>
+      <FILE id="XMXPEA" name="FrequencySpectrum.h" compile="0" resource="0"
+            file="Source/FrequencySpectrum.h"/>
+      <FILE id="Au7eww" name="Oscilloscope.cpp" compile="1" resource="0"
+            file="Source/Oscilloscope.cpp"/>
+      <FILE id="Rs1XH4" name="Oscilloscope.h" compile="0" resource="0" file="Source/Oscilloscope.h"/>
       <FILE id="I8JGC2" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
       <FILE id="unosMo" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
       <FILE id="YbBaAS" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
@@ -37,6 +50,7 @@
         <MODULEPATH id="juce_graphics" path="../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
@@ -50,6 +64,7 @@
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

@@ -20,14 +20,44 @@ SineWaveSynthesizerAudioProcessor::SineWaveSynthesizerAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-     tree(*this, nullptr, "PARAM",
-          std::make_unique<juce::AudioParameterFloat>("level",
-                                                      "Level",
-                                                      juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
-                                                      juce::String(),
-                                                      juce::AudioProcessorParameter::genericParameter,
-                                                      [](float value, int){return juce::String(value);},
-                                                      [](juce::String text){ return text.getFloatValue();}))
+tree(*this, nullptr, "PARAM",
+    {
+        std::make_unique<juce::AudioParameterFloat>("level",
+                                                    "Level",
+                                                    juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
+                                                    juce::String(),
+                                                    juce::AudioProcessorParameter::genericParameter,
+                                                    [](float value, int){return juce::String(value);},
+                                                    [](juce::String text){ return text.getFloatValue();}),
+        std::make_unique<juce::AudioParameterFloat>("attack",
+                                                    "Attack",
+                                                    juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
+                                                    juce::String(),
+                                                    juce::AudioProcessorParameter::genericParameter,
+                                                    [](float value, int){return juce::String(value) + " s";},
+                                                    [](juce::String text){ return text.getFloatValue();}),
+        std::make_unique<juce::AudioParameterFloat>("decay",
+                                                    "Decay",
+                                                    juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
+                                                    juce::String(),
+                                                    juce::AudioProcessorParameter::genericParameter,
+                                                    [](float value, int){return juce::String(value) + " s";},
+                                                    [](juce::String text){ return text.getFloatValue();}),
+        std::make_unique<juce::AudioParameterFloat>("sustain",
+                                                    "Sustain",
+                                                    juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
+                                                    juce::String(),
+                                                    juce::AudioProcessorParameter::genericParameter,
+                                                    [](float value, int){return juce::String(value);},
+                                                    [](juce::String text){ return text.getFloatValue();}),
+        std::make_unique<juce::AudioParameterFloat>("release",
+                                                    "Release",
+                                                    juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f), 0.5f,
+                                                    juce::String(),
+                                                    juce::AudioProcessorParameter::genericParameter,
+                                                    [](float value, int){return juce::String(value) + " s";},
+                                                    [](juce::String text){ return text.getFloatValue();})
+    })
 #endif
 {
     mySynth.clearSounds();
@@ -113,6 +143,7 @@ void SineWaveSynthesizerAudioProcessor::prepareToPlay (double sampleRate, int sa
     // initialisation that you need..
     lastSampleRate = sampleRate;
     mySynth.setCurrentPlaybackSampleRate(sampleRate);
+    singleChannelSampleFifo.prepare(samplesPerBlock);
 }
 
 void SineWaveSynthesizerAudioProcessor::releaseResources()
@@ -160,9 +191,14 @@ void SineWaveSynthesizerAudioProcessor::processBlock (juce::AudioBuffer<float>& 
     {
         auto* myVoice = dynamic_cast<SynthVoice*>(mySynth.getVoice(i));
         myVoice->setLevel(tree.getRawParameterValue("level")->load());
+        myVoice->setADSR(tree.getRawParameterValue("attack")->load(),
+                         tree.getRawParameterValue("decay")->load(),
+                         tree.getRawParameterValue("sustain")->load(),
+                         tree.getRawParameterValue("release")->load());
     }
     mySynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
+    singleChannelSampleFifo.update(buffer);
    
 }
 

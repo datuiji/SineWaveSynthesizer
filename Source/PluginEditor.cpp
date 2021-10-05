@@ -10,21 +10,18 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-SineWaveSynthesizerAudioProcessorEditor::SineWaveSynthesizerAudioProcessorEditor (SineWaveSynthesizerAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+SineWaveSynthesizerAudioProcessorEditor::SineWaveSynthesizerAudioProcessorEditor (SineWaveSynthesizerAudioProcessor& p):
+AudioProcessorEditor (&p),
+audioProcessor (p),
+waveform(p),
+spectrum(p),
+controller(p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
-    levelSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
-    levelSlider.setValue(0.5);
-    levelSlider.setTextBoxStyle(juce::Slider::TextBoxLeft,
-                                true,
-                                levelSlider.getTextBoxWidth(),
-                                levelSlider.getTextBoxHeight());
-    levelSliderAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.tree, "level", levelSlider));
-    
-    addAndMakeVisible(levelSlider);
+    setSize (1000, 800);
+    for (auto& comp : subComponents)
+        addAndMakeVisible(comp);
 }
 
 SineWaveSynthesizerAudioProcessorEditor::~SineWaveSynthesizerAudioProcessorEditor()
@@ -35,24 +32,29 @@ SineWaveSynthesizerAudioProcessorEditor::~SineWaveSynthesizerAudioProcessorEdito
 void SineWaveSynthesizerAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-    g.setColour(juce::Colours::white);
-    int x = 50;
-    int y = 100;
-    int width = 50;
-    int height = levelSlider.getHeight();
-    
-    g.drawFittedText("Level", x, y, width, height, juce::Justification::centred, 1);
-    
+    g.fillAll (juce::Colour(10,10,10));    
 }
 
 void SineWaveSynthesizerAudioProcessorEditor::resized()
 {
     auto area = getLocalBounds();
-    int sliderWidth = area.getWidth() / 2;
-    int sliderHeight = area.getHeight() / 4;
-    int x = 100;
-    int y = 100;
+    juce::FlexBox upFlexBox;
+    upFlexBox.flexDirection = juce::FlexBox::Direction::row;
+    upFlexBox.items.add(juce::FlexItem(waveform).withFlex(1.0f));
+    upFlexBox.items.add(juce::FlexItem(spectrum).withFlex(1.0f));
     
-    levelSlider.setBounds(x, y, sliderWidth, sliderHeight);
+    juce::FlexBox bottomFlexBox;
+    bottomFlexBox.flexDirection = juce::FlexBox::Direction::row;
+    bottomFlexBox.items.add(juce::FlexItem(controller).withFlex(1.0f));
+    
+    juce::FlexBox flexBox;
+    flexBox.flexDirection = juce::FlexBox::Direction::column;
+    flexBox.items.add(juce::FlexItem(upFlexBox).withFlex(3.0f));
+    flexBox.items.add(juce::FlexItem(bottomFlexBox).withFlex(1.0f));
+    flexBox.performLayout(area.reduced(10));
+    
+    for (auto& comp : subComponents)
+    {
+        comp->setBounds(comp->getBounds().reduced(3));
+    }
 }

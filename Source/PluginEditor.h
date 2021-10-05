@@ -10,6 +10,9 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Oscilloscope.h"
+#include "FrequencySpectrum.h"
+#include "SliderController.h"
 
 //==============================================================================
 /**
@@ -25,12 +28,12 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     SineWaveSynthesizerAudioProcessor& audioProcessor;
+    Oscilloscope waveform;
+    FrequencySpectrum spectrum;
+    SliderController controller;
     
-    juce::Slider levelSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> levelSliderAttachment;
+    std::vector<juce::Component*> subComponents {&waveform, &spectrum, &controller};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SineWaveSynthesizerAudioProcessorEditor)
 };

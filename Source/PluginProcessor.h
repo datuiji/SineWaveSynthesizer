@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "SynthSound.h"
 #include "SynthVoice.h"
+#include "FIFO.h"
 
 //==============================================================================
 /**
@@ -54,13 +55,18 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    SingleChannelSampleFifo<juce::AudioBuffer<float>>& getSingleChannelSampleFifo() {return singleChannelSampleFifo;}
 
     juce::AudioProcessorValueTreeState tree;
+        
 private:
     //==============================================================================
     juce::Synthesiser mySynth;
     
     double lastSampleRate;
     
+    SingleChannelSampleFifo<juce::AudioBuffer<float>> singleChannelSampleFifo {0};
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SineWaveSynthesizerAudioProcessor)
 };

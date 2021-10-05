@@ -27,7 +27,9 @@ public:
    
     void renderNextBlock (juce::AudioBuffer <float> &outputBuffer, int startSample, int numSamples) override;
     
-    void setLevel(float newLevel);
+    void setLevel (float newLevel);
+    
+    void setADSR (float attack, float decay, float sustain, float release);
     
 private:
     float level;
@@ -36,4 +38,8 @@ private:
     float currentAngle;
     float angleIncrement;
     float tailOff;
+    bool isPlaying = false;
+    
+    juce::ADSR adsr;
+    juce::ADSR::Parameters adsrParameters;
 };
